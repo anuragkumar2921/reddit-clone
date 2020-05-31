@@ -1,3 +1,3 @@
 # reddit-clone
 
-Spring boot application for reddit service.
+Reddit clone built using Spring Boot, Spring Security with JPA Authentication, Spring Data JPA with MySQL, Spring MVC.
