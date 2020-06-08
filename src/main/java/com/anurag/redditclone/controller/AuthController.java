@@ -1,5 +1,7 @@
 package com.anurag.redditclone.controller;
 
+import com.anurag.redditclone.dto.AuthenticationRequest;
+import com.anurag.redditclone.dto.AuthenticationResponse;
 import com.anurag.redditclone.dto.RegisterRequestDto;
 import com.anurag.redditclone.repository.UserRepository;
 import com.anurag.redditclone.repository.VerificationTokenRepository;
@@ -31,5 +33,10 @@ public class AuthController {
     public ResponseEntity<String> accountVerification(@PathVariable String tokenId) {
         authService.verifyToken(tokenId);
         return new ResponseEntity<>("User account successfully activated", HttpStatus.OK);
+    }
+
+    @PostMapping("/login")
+    public AuthenticationResponse login(@RequestBody AuthenticationRequest authenticationRequest) {
+        return authService.login(authenticationRequest);
     }
 }
