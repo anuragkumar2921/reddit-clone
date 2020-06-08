@@ -1,5 +1,7 @@
 package com.anurag.redditclone.service;
 
+import com.anurag.redditclone.dto.AuthenticationRequest;
+import com.anurag.redditclone.dto.AuthenticationResponse;
 import com.anurag.redditclone.dto.RegisterRequestDto;
 import com.anurag.redditclone.exception.RedditCloneException;
 import com.anurag.redditclone.model.NotificationEmail;
@@ -7,8 +9,13 @@ import com.anurag.redditclone.model.User;
 import com.anurag.redditclone.model.VerificationToken;
 import com.anurag.redditclone.repository.UserRepository;
 import com.anurag.redditclone.repository.VerificationTokenRepository;
+import com.anurag.redditclone.security.JwtUtils;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,13 +35,13 @@ public class AuthService {
     private static final String ACTIVATION_EMAIL_SUBJECT = "Activation Email";
     private static final String ACTIVATION_MESSAGE = "Thank you for signing up to Spring Reddit, please click on the below url to activate your account";
     private static final String REDIRECTING_URL = "http://localhost:8080/api/auth/accountVerification/";
-    private final PasswordEncoder passwordEncoder;
-
-    private final UserRepository userRepository;
-
-    private final VerificationTokenRepository verificationTokenRepository;
 
     private final MailService mailService;
+    private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
+    private final AuthenticationManager authenticationManager;
+    private final VerificationTokenRepository verificationTokenRepository;
+    private final JwtUtils jwtUtils;
 
     @Transactional
     public String signUp(RegisterRequestDto registerRequestDto) {
@@ -70,8 +77,15 @@ public class AuthService {
     @Transactional
     private void fetchUserAndEnable(VerificationToken verificationToken) {
         String userName = verificationToken.getUser().getUserName();
-        User user = userRepository.findByUserName(userName).orElseThrow(()-> new RedditCloneException("User not found for the userName : " + userName));
+        User user = userRepository.findByUserName(userName).orElseThrow(() -> new RedditCloneException("User not found for the userName : " + userName));
         user.setEnabled(true);
         userRepository.save(user);
+    }
+
+    public AuthenticationResponse login(AuthenticationRequest authenticationRequest) {
+        Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(authenticationRequest.getUserName(), authenticationRequest.getPassword()));
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+        String token = jwtUtils.generateToken(authentication);
+        return new AuthenticationResponse(token, authenticationRequest.getUserName());
     }
 }
