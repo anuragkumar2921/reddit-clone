@@ -25,7 +25,7 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long userId;
     @NotBlank(message = "User name cannot be null")
-    private String userName;
+    private String username;
     @NotBlank(message = "Password cannot be null")
     private String password;
     @NotBlank(message = "Email cannot be null")

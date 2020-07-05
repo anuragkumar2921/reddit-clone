@@ -16,6 +16,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -48,7 +49,7 @@ public class AuthService {
         User user = new User();
         user.setEmail(registerRequestDto.getEmail());
         user.setEnabled(false);
-        user.setUserName(registerRequestDto.getUserName());
+        user.setUsername(registerRequestDto.getUsername());
         user.setPassword(passwordEncoder.encode(registerRequestDto.getPassword()));
         user.setCreatedDate(Instant.now());
         userRepository.save(user);
@@ -76,16 +77,23 @@ public class AuthService {
 
     @Transactional
     private void fetchUserAndEnable(VerificationToken verificationToken) {
-        String userName = verificationToken.getUser().getUserName();
-        User user = userRepository.findByUserName(userName).orElseThrow(() -> new RedditCloneException("User not found for the userName : " + userName));
+        String username = verificationToken.getUser().getUsername();
+        User user = userRepository.findByUsername(username).orElseThrow(() -> new RedditCloneException("User not found for the username : " + username));
         user.setEnabled(true);
         userRepository.save(user);
     }
 
     public AuthenticationResponse login(AuthenticationRequest authenticationRequest) {
-        Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(authenticationRequest.getUserName(), authenticationRequest.getPassword()));
+        Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(authenticationRequest.getUsername(), authenticationRequest.getPassword()));
         SecurityContextHolder.getContext().setAuthentication(authentication);
         String token = jwtUtils.generateToken(authentication);
-        return new AuthenticationResponse(token, authenticationRequest.getUserName());
+        return new AuthenticationResponse(token, authenticationRequest.getUsername());
+    }
+
+    @Transactional(readOnly = true)
+    public User getCurrentUser() {
+        String principal =  SecurityContextHolder.getContext().getAuthentication().getPrincipal().toString();
+        return userRepository.findByUsername(principal)
+                .orElseThrow(() -> new UsernameNotFoundException("User name not found - " + principal));
     }
 }

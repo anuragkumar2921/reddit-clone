@@ -5,13 +5,16 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * Created by anurag on 1/6/20.
+ * Created by anurag on 5/7/20.
  */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class RegisterRequestDto {
-    private String email;
+public class PostResponse {
+    private Long id;
+    private String postName;
+    private String description;
+    private String url;
+    private String subredditName;
     private String username;
-    private String password;
 }
