@@ -25,10 +25,10 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     private final UserRepository userRepository;
 
     @Override
-    public UserDetails loadUserByUsername(String userName) throws UsernameNotFoundException {
-        Optional<User> optionalUser = userRepository.findByUserName(userName);
-        User user = optionalUser.orElseThrow(() -> new RedditCloneException("User not found for the user name : " + userName));
-        return new org.springframework.security.core.userdetails.User(user.getUserName(), user.getPassword(), getAuthority("USER"));
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        Optional<User> optionalUser = userRepository.findByUsername(username);
+        User user = optionalUser.orElseThrow(() -> new RedditCloneException("User not found for the user name : " + username));
+        return new org.springframework.security.core.userdetails.User(user.getUsername(), user.getPassword(), getAuthority("USER"));
     }
 
     private Collection<? extends GrantedAuthority> getAuthority(String role) {
