@@ -1,44 +1,31 @@
-# Common gitignore taken from: https://github.com/spring-projects/spring-boot/blob/master/.gitignore
+HELP.md
+target/
+!.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**
+!**/src/test/**
 
-.gradle
-*.sw?
-.#*
-*#
-*~
-/build
-/code
+### STS ###
+.apt_generated
 .classpath
+.factorypath
 .project
 .settings
-.metadata
-.factorypath
-.recommenders
-bin
-build
-lib/
-target/
-data/
-.factorypath
 .springBeans
-interpolated*.xml
-dependency-reduced-pom.xml
-build.log
-_site/
-.*.md.html
-manifest.yml
-MANIFEST.MF
-settings.xml
-activemq-data
-overridedb.*
+.sts4-cache
+
+### IntelliJ IDEA ###
+.idea
+*.iws
 *.iml
 *.ipr
-*.iws
-.idea
-*.jar
-.DS_Store
-.factorypath
-dump.rdb
-transaction-logs
-*.log
-data/**
-*.patch
+
+### NetBeans ###
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+build/
+
+### VS Code ###
+.vscode/
